@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id      Int     @id @default(autoincrement())
+  email   String  @unique
+  name    String?
+}
+
+model People {
+  id            Int     @id @default(autoincrement())
+  businesses    Business[]
+  firstName     String
+  lastName      String
+  tags          Tag[]
+  tasks         Task[]
+}
+
+model Business {
+  id            Int     @id @default(autoincrement())
+  categories    Category[]
+  name          String
+  people        People  @relation(fields: [peopleId], references: [id])
+  peopleId      Int
+  tags          Tag[]
+  tasks         Task[]
+}
+
+model Tag {
+  id            Int       @id @default(autoincrement())
+  business      Business  @relation(fields: [businessId], references: [id])
+  businessId    Int
+  name          String
+  people        People    @relation(fields: [peopleId], references: [id])
+  peopleId      Int
+}
+
+model Category {
+  id            Int       @id @default(autoincrement())
+  business      Business  @relation(fields: [businessId], references: [id])
+  businessId    Int
+  name          String
+}
+
+model Task {
+  id            Int       @id @default(autoincrement())
+  business      Business  @relation(fields: [businessId], references: [id])
+  businessId    Int
+  description   String
+  people        People    @relation(fields: [peopleId], references: [id])
+  peopleId      Int
+  title         String
+}
+
