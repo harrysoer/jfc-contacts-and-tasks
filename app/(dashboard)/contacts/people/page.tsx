@@ -7,6 +7,7 @@ import {
   PencilIcon,
   TrashIcon,
   PlusIcon,
+  ClipboardDocumentListIcon,
 } from "@heroicons/react/24/outline";
 import {
   usePeople,
@@ -22,6 +23,7 @@ import Modal from "@/src/components/Modal";
 import TextInput from "@/src/components/TextInput";
 import Button from "@/src/components/Button";
 import MultiSelect, { SelectOption } from "@/src/components/MultiSelect";
+import AssignTaskModal, { AssignableEntity } from "@/src/components/AssignTaskModal";
 
 type FormData = {
   firstName: string;
@@ -41,6 +43,8 @@ export default function PeoplePage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPerson, setEditingPerson] = useState<Person | null>(null);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [taskAssignEntity, setTaskAssignEntity] = useState<AssignableEntity | null>(null);
 
   const {
     register,
@@ -126,6 +130,20 @@ export default function PeoplePage() {
     }
   };
 
+  const handleAssignTask = (person: Person) => {
+    setTaskAssignEntity({
+      type: "person",
+      id: person.id,
+      name: `${person.firstName} ${person.lastName}`,
+    });
+    setIsTaskModalOpen(true);
+  };
+
+  const handleCloseTaskModal = () => {
+    setIsTaskModalOpen(false);
+    setTaskAssignEntity(null);
+  };
+
   const onSubmit = (data: FormData) => {
     const payload = {
       firstName: data.firstName,
@@ -207,9 +225,19 @@ export default function PeoplePage() {
           <button
             onClick={(e) => {
               e.stopPropagation();
+              handleAssignTask(row);
+            }}
+            className="p-1 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded cursor-pointer"
+            title="Assign Task"
+          >
+            <ClipboardDocumentListIcon className="w-4 h-4" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
               handleEdit(row);
             }}
-            className="p-1 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded"
+            className="p-1 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded cursor-pointer"
           >
             <PencilIcon className="w-4 h-4" />
           </button>
@@ -218,7 +246,7 @@ export default function PeoplePage() {
               e.stopPropagation();
               handleDelete(row);
             }}
-            className="p-1 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded"
+            className="p-1 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded cursor-pointer"
           >
             <TrashIcon className="w-4 h-4" />
           </button>
@@ -325,6 +353,12 @@ export default function PeoplePage() {
           </div>
         </form>
       </Modal>
+
+      <AssignTaskModal
+        isOpen={isTaskModalOpen}
+        onClose={handleCloseTaskModal}
+        entity={taskAssignEntity}
+      />
     </div>
   );
 }

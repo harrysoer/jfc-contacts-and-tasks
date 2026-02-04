@@ -9,6 +9,7 @@ import Modal from "@/src/components/Modal";
 import TextInput from "@/src/components/TextInput";
 import Button from "@/src/components/Button";
 import MultiSelect, { SelectOption } from "@/src/components/MultiSelect";
+import ConfirmationModal from "@/src/components/ConfirmationModal";
 
 export type AssignableEntity =
   | { type: "business"; id: string; name: string }
@@ -252,44 +253,25 @@ export default function AssignTaskModal({
         </div>
       </form>
 
-      {/* Status Change Confirmation Modal */}
-      {showConfirmModal && taskToUpdate && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={handleCancelStatusChange}
-          />
-          <div className="relative bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Change Task Status
-            </h3>
-            <p className="text-sm text-gray-600 mb-4">
+      <ConfirmationModal
+        isOpen={showConfirmModal && !!taskToUpdate}
+        onClose={handleCancelStatusChange}
+        onConfirm={handleConfirmStatusChange}
+        title="Change Task Status"
+        message={
+          taskToUpdate && (
+            <>
               Are you sure you want to mark{" "}
               <span className="font-medium">&quot;{taskToUpdate.title}&quot;</span> as{" "}
               <span className="font-medium">
                 {taskToUpdate.status === "PENDING" ? "completed" : "pending"}
               </span>
               ?
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleCancelStatusChange}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleConfirmStatusChange}
-                disabled={updateTask.isPending}
-              >
-                {updateTask.isPending ? "Updating..." : "Confirm"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+            </>
+          )
+        }
+        isLoading={updateTask.isPending}
+      />
     </Modal>
   );
 }

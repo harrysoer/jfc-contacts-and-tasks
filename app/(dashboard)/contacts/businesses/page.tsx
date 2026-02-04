@@ -7,6 +7,7 @@ import {
   PencilIcon,
   TrashIcon,
   PlusIcon,
+  ClipboardDocumentListIcon,
 } from "@heroicons/react/24/outline";
 import {
   useBusinesses,
@@ -22,6 +23,7 @@ import Modal from "@/src/components/Modal";
 import TextInput from "@/src/components/TextInput";
 import Button from "@/src/components/Button";
 import MultiSelect, { SelectOption } from "@/src/components/MultiSelect";
+import AssignTaskModal, { AssignableEntity } from "@/src/components/AssignTaskModal";
 
 type FormData = {
   name: string;
@@ -40,6 +42,8 @@ export default function BusinessesPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBusiness, setEditingBusiness] = useState<Business | null>(null);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [taskAssignEntity, setTaskAssignEntity] = useState<AssignableEntity | null>(null);
 
   const {
     register,
@@ -118,6 +122,20 @@ export default function BusinessesPage() {
         },
       });
     }
+  };
+
+  const handleAssignTask = (business: Business) => {
+    setTaskAssignEntity({
+      type: "business",
+      id: business.id,
+      name: business.name,
+    });
+    setIsTaskModalOpen(true);
+  };
+
+  const handleCloseTaskModal = () => {
+    setIsTaskModalOpen(false);
+    setTaskAssignEntity(null);
   };
 
   const onSubmit = (data: FormData) => {
@@ -215,9 +233,19 @@ export default function BusinessesPage() {
           <button
             onClick={(e) => {
               e.stopPropagation();
+              handleAssignTask(row);
+            }}
+            className="p-1 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded cursor-pointer"
+            title="Assign Task"
+          >
+            <ClipboardDocumentListIcon className="w-4 h-4" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
               handleEdit(row);
             }}
-            className="p-1 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded"
+            className="p-1 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded cursor-pointer"
           >
             <PencilIcon className="w-4 h-4" />
           </button>
@@ -226,7 +254,7 @@ export default function BusinessesPage() {
               e.stopPropagation();
               handleDelete(row);
             }}
-            className="p-1 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded"
+            className="p-1 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded cursor-pointer"
           >
             <TrashIcon className="w-4 h-4" />
           </button>
@@ -323,6 +351,12 @@ export default function BusinessesPage() {
           </div>
         </form>
       </Modal>
+
+      <AssignTaskModal
+        isOpen={isTaskModalOpen}
+        onClose={handleCloseTaskModal}
+        entity={taskAssignEntity}
+      />
     </div>
   );
 }
