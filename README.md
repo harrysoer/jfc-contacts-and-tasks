@@ -1,4 +1,4 @@
-# JFC Coding Test
+# JFC Contacts & Tasks
 
 A [Next.js](https://nextjs.org) project for managing contacts, businesses, and tasks.
 
