@@ -149,7 +149,7 @@ export async function main() {
       data: {
         title: "Review quarterly report",
         description: "Analyze Q4 financial data and prepare summary",
-        status: "TODO",
+        status: "PENDING",
         dueDate: new Date("2026-03-01"),
         businessId: businesses[0].id,
         personId: people[0].id,
@@ -159,7 +159,7 @@ export async function main() {
       data: {
         title: "Update website",
         description: "Redesign landing page with new branding",
-        status: "IN_PROGRESS",
+        status: "PENDING",
         dueDate: new Date("2026-02-15"),
         businessId: businesses[1].id,
         personId: people[1].id,
@@ -169,7 +169,7 @@ export async function main() {
       data: {
         title: "Solar panel installation",
         description: "Coordinate installation at new facility",
-        status: "TODO",
+        status: "PENDING",
         dueDate: new Date("2026-04-01"),
         businessId: businesses[2].id,
         personId: people[2].id,
@@ -179,7 +179,7 @@ export async function main() {
       data: {
         title: "Brand guidelines",
         description: "Create comprehensive brand style guide",
-        status: "DONE",
+        status: "COMPLETED",
         businessId: businesses[3].id,
       },
     }),
@@ -187,7 +187,7 @@ export async function main() {
       data: {
         title: "Client presentation",
         description: "Prepare slides for upcoming investor meeting",
-        status: "TODO",
+        status: "PENDING",
         dueDate: new Date("2026-02-20"),
         businessId: businesses[0].id,
         personId: people[0].id,
