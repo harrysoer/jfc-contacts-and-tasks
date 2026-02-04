@@ -1,17 +1,15 @@
 "use client";
 
-import Select, { MultiValue, StylesConfig } from "react-select";
+import Select, { MultiValue, SingleValue, StylesConfig } from "react-select";
 
 export interface SelectOption {
   value: string;
   label: string;
 }
 
-interface MultiSelectProps {
+interface BaseSelectProps {
   label?: string;
   options: SelectOption[];
-  value: SelectOption[];
-  onChange: (selected: SelectOption[]) => void;
   placeholder?: string;
   error?: string;
   isDisabled?: boolean;
@@ -20,23 +18,44 @@ interface MultiSelectProps {
   className?: string;
 }
 
-export default function MultiSelect({
-  label,
-  options,
-  value,
-  onChange,
-  placeholder = "Select...",
-  error,
-  isDisabled = false,
-  isLoading = false,
-  isClearable = true,
-  className = "",
-}: MultiSelectProps) {
-  const handleChange = (selected: MultiValue<SelectOption>) => {
-    onChange(selected as SelectOption[]);
+interface MultiSelectModeProps extends BaseSelectProps {
+  isMulti: true;
+  value: SelectOption[];
+  onChange: (selected: SelectOption[]) => void;
+}
+
+interface SingleSelectModeProps extends BaseSelectProps {
+  isMulti?: false;
+  value: SelectOption | null;
+  onChange: (selected: SelectOption | null) => void;
+}
+
+type SelectProps = MultiSelectModeProps | SingleSelectModeProps;
+
+export default function MultiSelect(props: SelectProps) {
+  const {
+    label,
+    options,
+    placeholder = "Select...",
+    error,
+    isDisabled = false,
+    isLoading = false,
+    isClearable = true,
+    className = "",
+    isMulti,
+  } = props;
+
+  const handleChange = (
+    selected: MultiValue<SelectOption> | SingleValue<SelectOption>
+  ) => {
+    if (props.isMulti) {
+      props.onChange(selected as SelectOption[]);
+    } else {
+      props.onChange(selected as SelectOption | null);
+    }
   };
 
-  const customStyles: StylesConfig<SelectOption, true> = {
+  const customStyles: StylesConfig<SelectOption, boolean> = {
     control: (base, state) => ({
       ...base,
       borderColor: error
@@ -94,9 +113,9 @@ export default function MultiSelect({
         </label>
       )}
       <Select
-        isMulti
+        isMulti={isMulti}
         options={options}
-        value={value}
+        value={props.value}
         onChange={handleChange}
         placeholder={placeholder}
         isDisabled={isDisabled}
