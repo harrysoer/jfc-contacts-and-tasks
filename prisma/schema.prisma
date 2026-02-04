@@ -14,53 +14,117 @@ datasource db {
 }
 
 model User {
-  id      Int     @id @default(autoincrement())
-  email   String  @unique
-  name    String?
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  password String
 }
 
-model People {
-  id            Int     @id @default(autoincrement())
-  businesses    Business[]
-  firstName     String
-  lastName      String
-  tags          Tag[]
-  tasks         Task[]
+model Person {
+  id          String    @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?   @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  businessId  String?
+  business    Business? @relation(fields: [businessId], references: [id])
+
+  tags        PersonTag[]
+  tasks       Task[]
 }
+
 
 model Business {
-  id            Int     @id @default(autoincrement())
-  categories    Category[]
-  name          String
-  people        People  @relation(fields: [peopleId], references: [id])
-  peopleId      Int
-  tags          Tag[]
-  tasks         Task[]
-}
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-model Tag {
-  id            Int       @id @default(autoincrement())
-  business      Business  @relation(fields: [businessId], references: [id])
-  businessId    Int
-  name          String
-  people        People    @relation(fields: [peopleId], references: [id])
-  peopleId      Int
+  // Relations
+  people      Person[]
+  categories  BusinessCategory[]
+  tags        BusinessTag[]
+  tasks       Task[]
 }
 
 model Category {
-  id            Int       @id @default(autoincrement())
-  business      Business  @relation(fields: [businessId], references: [id])
-  businessId    Int
-  name          String
+  id        String              @id @default(cuid())
+  name      String              @unique
+  createdAt DateTime            @default(now())
+
+  businesses BusinessCategory[]
 }
+
+model BusinessCategory {
+  businessId String
+  categoryId String
+
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([businessId, categoryId])
+}
+
+
+
+model Tag {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  createdAt DateTime     @default(now())
+
+  businesses BusinessTag[]
+  people     PersonTag[]
+}
+
+model BusinessTag {
+  businessId String
+  tagId      String
+
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([businessId, tagId])
+}
+
+model PersonTag {
+  personId String
+  tagId    String
+
+  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([personId, tagId])
+}
+
 
 model Task {
-  id            Int       @id @default(autoincrement())
-  business      Business  @relation(fields: [businessId], references: [id])
-  businessId    Int
-  description   String
-  people        People    @relation(fields: [peopleId], references: [id])
-  peopleId      Int
-  title         String
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  dueDate     DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Polymorphic-like relations (safe Prisma pattern)
+  businessId  String?
+  business    Business?  @relation(fields: [businessId], references: [id])
+
+  personId    String?
+  person      Person?    @relation(fields: [personId], references: [id])
+
+  @@index([businessId])
+  @@index([personId])
 }
 
+
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
